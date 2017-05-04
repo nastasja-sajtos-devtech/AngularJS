@@ -2,15 +2,29 @@ var myApp = angular.module('app', []);
 
  //main controller
  myApp.controller('mainController', function($scope, $http){
+   
+   $scope.search = function(){
+     $http.get("https://api.github.com/users/" + $scope.username)
+      .then(onComplete, error)
+   };
+   
+   var error = function(){
+     $scope.error = "Could not find user";
+   };
+   
+   var onComplete = function(response){
+     $scope.user = response.data;
+     $http.get($scope.user.repos_url)
+      .then(onRepos, error)
+   };
+   
+   var onRepos = function(response){
+     $scope.repos = response.data;
+   }
   
-  $http.get("https://api.github.com/users/nastasja-sajtos-devtech")
-      .then(function(response){
-        $scope.user = response.data;
-      }, function(reason){
-        $scope.error = "Could not fetch the user";
-      })
-  
-  $scope.message = "Hello, Angular";
+  $scope.username = "angular";
+  $scope.message = "GitHub Viewer";
+  $scope.sortOrder = "-stargazers_count";
 
   
  });
